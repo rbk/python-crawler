@@ -52,7 +52,8 @@ a.execute(image_table)
 # url
 url1 = 'http://www.useragentstring.com/pages/useragentstring.php'
 url = 'https://cliniciansbrief.com'
-# url = re.sub('/', '')
+url = re.sub(r"\/$",  '', url) # replace last slash
+
 print('>>> url '  + url)
 context = ssl._create_unverified_context()
 ssl._create_default_https_context = ssl._create_unverified_context
@@ -87,6 +88,8 @@ for link in soup.find_all('a'):
 	links.append(link.get('href'))
 
 for link in links:
+	link = re.sub(r"^\/",  '', link) # replace first slash
+	link = url + '/' + link
 	try:
 		add_link = 'INSERT INTO link_queue (url) VALUES ("'+link+'")'
 		a.execute(add_link)
