@@ -9,6 +9,7 @@ import cgi
 import cgitb
 import sys 
 import os
+print('>>> ' + sys.version)
 cgitb.enable()
 from urllib.request import Request, urlopen
 import pymysql
@@ -51,39 +52,39 @@ a.execute(image_table)
 # url
 url1 = 'http://www.useragentstring.com/pages/useragentstring.php'
 url = 'https://cliniciansbrief.com'
+# url = re.sub('/', '')
+print('>>> url '  + url)
 context = ssl._create_unverified_context()
 ssl._create_default_https_context = ssl._create_unverified_context
 
 agent1 = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'
 agent = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+
+print('>>> user agent '  + agent1)
 headers={'User-Agent': agent1}
 response = Request(url, headers=headers)
 html = urlopen(response).read().decode('utf8')
-print(type(html))
 html_escaped = re.escape(html)
+soup = BeautifulSoup(html, 'html.parser')
 
 add_submission = '''
 	INSERT INTO submissions (url, html)
 	VALUES ("%s","%s")
 '''
-
 add_submission2 = 'INSERT INTO submissions (url, html) VALUES ("'+url+'", "'+html_escaped+'")'
 
+print('>>> save page')
 a.execute(add_submission2)
 conn.commit()
 
 # a.execute(add_submission, (url, html))
 # conn.commit()
 
+# Get Links
+print('>>> get links')
 links = []
-soup = BeautifulSoup(html, 'html.parser')
 for link in soup.find_all('a'):
 	links.append(link.get('href'))
-
-images = []
-soup = BeautifulSoup(html, 'html.parser')
-for image in soup.find_all('img'):
-	images.append(image.get('src'))
 
 for link in links:
 	try:
@@ -92,7 +93,13 @@ for link in links:
 		conn.commit()
 	except:
 		'null'
-	
+
+# Get images
+print('>>> get images')
+images = []
+for image in soup.find_all('img'):
+	images.append(image.get('src'))
+
 for image in images:
 	try:
 		add_image = 'INSERT INTO images (url) VALUES ("'+image+'")'
@@ -101,16 +108,11 @@ for image in images:
 	except:
 		'null'
 
-print('>>> Closing DB connection')
-print(strftime("%a, %d %b %Y %H:%M:%S", localtime()))
+# End
+extime = strftime("%a, %d %b %Y %H:%M:%S", localtime())
+print('>>> Closing DB connection: ' + extime)
 
 
-
-
-
-# db.query("insert into submissions (url, html) values ('" + url + "', '" + html + "')")
-
-# soup = BeautifulSoup(html, 'html.parser')
 # print(soup.prettify())
 # print(soup.title.string)
 # print(soup.find('meta'))
