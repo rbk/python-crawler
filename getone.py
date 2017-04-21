@@ -7,36 +7,45 @@ import re
 from time import localtime, strftime
 import cgi
 import cgitb
+import sys 
+import os
 cgitb.enable()
 from urllib.request import Request, urlopen
 import pymysql
 conn = pymysql.connect(
 	host='localhost',
 	user='root',
-	password='',
+	password='password',
 	db='s1',
 	charset='utf8mb4',
 	cursorclass=pymysql.cursors.DictCursor
 )
 a = conn.cursor()
 
-
+a.execute('drop table if exists submissions')
 submission_table = '''CREATE TABLE IF NOT EXISTS submissions (
-	id int auto_increment primary key,
-	url varchar(255) not null,
-	html longtext not null
+	`id` int auto_increment primary key,
+	`url` varchar(255) not null,
+	`html` longtext not null,
+	`date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 )'''
-
 a.execute('drop table if exists link_queue')
-
 link_queue_table = '''CREATE TABLE IF NOT EXISTS link_queue (
 	`id` int auto_increment primary key,
 	`url` varchar(255) not null unique,
 	`date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 	)'''
 
+a.execute('drop table if exists images')
+image_table = '''CREATE TABLE IF NOT EXISTS images (
+	`id` int auto_increment primary key,
+	`url` varchar(255) not null unique,
+	`date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+	)'''
 a.execute(submission_table)
 a.execute(link_queue_table)
+a.execute(image_table)
+
 
 
 # url
@@ -71,17 +80,26 @@ soup = BeautifulSoup(html, 'html.parser')
 for link in soup.find_all('a'):
 	links.append(link.get('href'))
 
-print(links)
+images = []
+soup = BeautifulSoup(html, 'html.parser')
+for image in soup.find_all('img'):
+	images.append(image.get('src'))
 
 for link in links:
-	# a.execute(add_link, (link))
 	try:
 		add_link = 'INSERT INTO link_queue (url) VALUES ("'+link+'")'
 		a.execute(add_link)
 		conn.commit()
 	except:
-		print('Already exists')
+		'null'
 	
+for image in images:
+	try:
+		add_image = 'INSERT INTO images (url) VALUES ("'+image+'")'
+		a.execute(add_image)
+		conn.commit()
+	except:
+		'null'
 
 print('>>> Closing DB connection')
 print(strftime("%a, %d %b %Y %H:%M:%S", localtime()))
