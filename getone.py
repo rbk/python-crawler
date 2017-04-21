@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-# -*- coding: UTF-8 -*-
-
+# encoding=utf8
+from bs4 import BeautifulSoup
 import ssl
 import smtplib
 import re
@@ -9,26 +9,39 @@ import cgi
 import cgitb
 cgitb.enable()
 from urllib.request import Request, urlopen
-import sqlite3
-dbname = 'search.db'
-print('>>> Connecting to SQLITE database: ' + dbname)
-conn = sqlite3.connect(dbname)
-print('>>> Creating cursor')
-c = conn.cursor()
+import pymysql
+conn = pymysql.connect(
+	host='localhost',
+	user='root',
+	password='',
+	db='s1',
+	charset='utf8mb4',
+	cursorclass=pymysql.cursors.DictCursor
+)
+a = conn.cursor()
 
-submission_table = '''create table IF NOT EXISTS submissions (
+
+submission_table = '''CREATE TABLE IF NOT EXISTS submissions (
 	id int auto_increment primary key,
 	url varchar(255) not null,
 	html longtext not null
 )'''
 
-print('>>> Running SQL: ' + submission_table)
-c.execute(submission_table)
-conn.commit()
+a.execute('drop table if exists link_queue')
+
+link_queue_table = '''CREATE TABLE IF NOT EXISTS link_queue (
+	`id` int auto_increment primary key,
+	`url` varchar(255) not null unique,
+	`date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+	)'''
+
+a.execute(submission_table)
+a.execute(link_queue_table)
+
 
 # url
 url1 = 'http://www.useragentstring.com/pages/useragentstring.php'
-url = 'http://www.useragentstring.com/pages/useragentstring.php?name=Accoona-AI-Agent'
+url = 'https://cliniciansbrief.com'
 context = ssl._create_unverified_context()
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -36,17 +49,40 @@ agent1 = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KH
 agent = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
 headers={'User-Agent': agent1}
 response = Request(url, headers=headers)
-html = urlopen(response).read()
-html = re.escape(html)
+html = urlopen(response).read().decode('utf8')
+print(type(html))
+html_escaped = re.escape(html)
 
-# html = 'test'
+add_submission = '''
+	INSERT INTO submissions (url, html)
+	VALUES ("%s","%s")
+'''
 
-c.execute('INSERT INTO submissions (url, html) VALUES ("'+url+'", "'+html+'")')
+add_submission2 = 'INSERT INTO submissions (url, html) VALUES ("'+url+'", "'+html_escaped+'")'
+
+a.execute(add_submission2)
 conn.commit()
 
+# a.execute(add_submission, (url, html))
+# conn.commit()
 
+links = []
+soup = BeautifulSoup(html, 'html.parser')
+for link in soup.find_all('a'):
+	links.append(link.get('href'))
 
-conn.close()
+print(links)
+
+for link in links:
+	# a.execute(add_link, (link))
+	try:
+		add_link = 'INSERT INTO link_queue (url) VALUES ("'+link+'")'
+		a.execute(add_link)
+		conn.commit()
+	except:
+		print('Already exists')
+	
+
 print('>>> Closing DB connection')
 print(strftime("%a, %d %b %Y %H:%M:%S", localtime()))
 
