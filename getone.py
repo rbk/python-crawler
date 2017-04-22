@@ -105,7 +105,7 @@ for link in links:
 		link = re.sub(r"^\/",  '', link) # replace first slash
 		link = url + '/' + link
 
-	# print(link) # DEBUG
+	print(link) # DEBUG
 
 
 	if domain in link :
@@ -130,11 +130,13 @@ for image_url in images:
 	if not has_domain:
 		image_url = url + '/' + image_url
 	
-	# response = Request(image_url, headers=headers)
-	# imgdata = urlopen(response)
-	# size = imgdata.headers.get("content-length")
-	# size = float(size)/float(1000);
+	response = Request(image_url, headers=headers)
+	imgdata = urlopen(response)
+	size = imgdata.headers.get("content-length")
+	size = float(size)/float(1000);
 	size = 'unknown'
+
+	print(image_url)
 
 	try:
 		add_image = 'INSERT INTO images (url, size) VALUES ("'+image_url+'", "'+size+'")'
