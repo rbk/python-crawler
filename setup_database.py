@@ -1,17 +1,22 @@
 import pymysql
+import settings
+
 conn = pymysql.connect(
-	host='localhost',
-	user='root',
-	password='password',
-	db='s1',
+	host=settings.dbhost,
+	user=settings.dbuser,
+	password=settings.dbpassword,
+	db=settings.dbname,
 	charset='utf8mb4',
 	cursorclass=pymysql.cursors.DictCursor
 )
+
+print('>>> dropping all tables')
 a = conn.cursor()
 a.execute('drop table if exists images')
 a.execute('drop table if exists link_queue')
 a.execute('drop table if exists submissions')
 
+print('>>> creating submissions table')
 submission_table = '''CREATE TABLE IF NOT EXISTS submissions (
 	`id` int auto_increment primary key,
 	`url` varchar(255) not null,
@@ -19,6 +24,7 @@ submission_table = '''CREATE TABLE IF NOT EXISTS submissions (
 	`date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 )'''
 
+print('>>> creating link_queue table')
 link_queue_table = '''
 	CREATE TABLE IF NOT EXISTS link_queue (
 	`id` int auto_increment,
@@ -31,6 +37,7 @@ link_queue_table = '''
 	)'''
 
 
+print('>>> creating images table')
 image_table = '''
 	CREATE TABLE IF NOT EXISTS images (
 	`id` int auto_increment,
@@ -46,3 +53,4 @@ image_table = '''
 a.execute(submission_table)
 a.execute(link_queue_table)
 a.execute(image_table)
+print('>>> tables created!')

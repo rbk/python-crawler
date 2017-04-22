@@ -65,7 +65,7 @@ a.execute(image_table)
 
 # url
 url1 = 'http://www.useragentstring.com/pages/useragentstring.php'
-url = 'https://www.cliniciansbrief.com/'
+url = 'http://richardkeller.net'
 url = re.sub(r"\/$",  '', url) # replace last slash
 domain = re.sub(r"http:\/\/|https:\/\/|\/\/", '', url)
 print(domain)
