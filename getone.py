@@ -35,22 +35,26 @@ submission_table = '''CREATE TABLE IF NOT EXISTS submissions (
 
 link_queue_table = '''
 	CREATE TABLE IF NOT EXISTS link_queue (
-	`id` int auto_increment primary key,
+	`id` int auto_increment,
 	`url` varchar(255) not null unique,
 	`text` varchar(255),
 	`did` int not null,
-	`date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+	`date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY(id),
+  FOREIGN KEY(did) REFERENCES submissions(id)
 	)'''
 
 
 image_table = '''
 	CREATE TABLE IF NOT EXISTS images (
-	`id` int auto_increment primary key,
+	`id` int auto_increment,
 	`url` varchar(255) not null unique,
 	`size` varchar(255) not null,
 	`alt` varchar(255),
 	`did` int not null,
-	`date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+	`date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY(id),
+  FOREIGN KEY(did) REFERENCES submissions(id)
 	)'''
 
 a.execute(submission_table)
