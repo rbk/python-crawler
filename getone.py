@@ -104,8 +104,8 @@ for link in links:
 		link = re.sub(r"^\/",  '', link) # replace first slash
 		link = url + '/' + link
 
+	# print(link) # DEBUG
 
-	print(link)
 
 	if domain in link :
 		try:
@@ -121,9 +121,18 @@ images = []
 for image in soup.find_all('img'):
 	images.append(image.get('src'))
 
-for image in images:
+for image_url in images:
+	domain_regex = '\/\/(?:[\w-]+\.)*([\w-]{1,63})(?:\.(?:\w{3}|\w{2}))'
+	has_domain = re.search(domain_regex, image_url)
+	image_url = re.sub(r"^\/",  '', image_url) # replace first slash
+
+	if not has_domain:
+		image_url = url + '/' + image_url
+	
+	print(image_url)
+		
 	try:
-		add_image = 'INSERT INTO images (url) VALUES ("'+image+'")'
+		add_image = 'INSERT INTO images (url) VALUES ("'+image_url+'")'
 		a.execute(add_image)
 		conn.commit()
 	except:
