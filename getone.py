@@ -51,8 +51,11 @@ a.execute(image_table)
 
 # url
 url1 = 'http://www.useragentstring.com/pages/useragentstring.php'
-url = 'https://cliniciansbrief.com'
+url = 'https://www.cliniciansbrief.com/'
 url = re.sub(r"\/$",  '', url) # replace last slash
+domain = re.sub(r"http:\/\/|https:\/\/|\/\/", '', url)
+print(domain)
+# sys.exit()
 
 print('>>> url '  + url)
 context = ssl._create_unverified_context()
@@ -87,15 +90,30 @@ links = []
 for link in soup.find_all('a'):
 	links.append(link.get('href'))
 
+# print(links)
+
 for link in links:
-	link = re.sub(r"^\/",  '', link) # replace first slash
-	link = url + '/' + link
-	try:
-		add_link = 'INSERT INTO link_queue (url) VALUES ("'+link+'")'
-		a.execute(add_link)
-		conn.commit()
-	except:
-		'null'
+
+	domain_regex = '\/\/(?:[\w-]+\.)*([\w-]{1,63})(?:\.(?:\w{3}|\w{2}))'
+	has_domain = re.search(domain_regex, link)
+
+	# print(has_domain)
+	if has_domain:
+			link = link
+	else :
+		link = re.sub(r"^\/",  '', link) # replace first slash
+		link = url + '/' + link
+
+
+	print(link)
+
+	if domain in link :
+		try:
+			add_link = 'INSERT INTO link_queue (url) VALUES ("'+link+'")'
+			a.execute(add_link)
+			conn.commit()
+		except:
+			'null'
 
 # Get images
 print('>>> get images')
