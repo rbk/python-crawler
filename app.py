@@ -26,6 +26,7 @@ def index():
         </html>
     '''
 
+# Database 
 import db_connection
 conn = db_connection.db_conn()
 a = conn.cursor()
