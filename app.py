@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+from flask import request
 import settings
 settings.db_conf()
 settings.dbhost = 'localhost'
@@ -10,22 +11,20 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return "Hello, World!"
-
-tasks = [
-    {
-        'id': 1,
-        'title': u'Buy groceries',
-        'description': u'Milk, Cheese, Pizza, Fruit, Tylenol', 
-        'done': False
-    },
-    {
-        'id': 2,
-        'title': u'Learn Python',
-        'description': u'Need to find a good Python tutorial on the web', 
-        'done': False
-    }
-]
+    return '''
+        <html>
+            <head>
+            </head>
+            <body>
+                <h1>Submit site</h1>
+                <form action="/submissions/api/v1.0/add" method="get">
+                    <label>URL</label>
+                    <input type="text" name="url"/>
+                    <button>Submit</button>
+                </form>
+            </body>
+        </html>
+    '''
 
 import db_connection
 conn = db_connection.db_conn()
@@ -40,9 +39,15 @@ a.execute(all_submissions)
 results = a.fetchall()
 
 
-@app.route('/submissions/api/v1.0/sites', methods=['GET'])
+# List all submissions in a tables
+@app.route('/submissions/api/v1.0/all', methods=['GET'])
 def get_sites():
     return jsonify({'sites': results})
+
+# Call our save submission function
+@app.route('/submissions/api/v1.0/add', methods=['GET'])
+def add_site():
+    return request.args['url']
 
 if __name__ == '__main__':
     app.run(debug=True)
