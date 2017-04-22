@@ -24,6 +24,22 @@ settings.dbname = 's1'
 
 
 import curl
+import save_submission
+
+def run():
+	links = save_submission.get_links_that_dont_exist_in_submissions()
+	# if not links
+	# print(links)
+	for u in links :
+		# print(u['url'])
+		result = curl.get_page(u['url'])
+		html = result['html']
+		url = result['url']
+		title = result['title']
+		save_submission.save(title, url, html)
+	# run()
+
+run()
 
 # while count < 100
 # 	submit a url
@@ -32,14 +48,14 @@ import curl
 # 	submit url
 
 
-result = curl.get_page('https://www.cliniciansbrief.com')
-html = result['html']
-url = result['url']
-soup = BeautifulSoup(html, 'html.parser')
-print(soup.title.string + ' - ' + result['url'])
+# result = curl.get_page('https://mattsatv.com/odes/assailant-800cc')
+# print(result['title'])
+# html = result['html']
+# url = result['url']
+# soup = BeautifulSoup(html, 'html.parser')
+# print(soup.title.string + ' - ' + result['url'])
 
 
-# import save_submission
 # 
 # for obj in soup.find_all('meta'):
 # 	# print(obj)
