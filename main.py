@@ -3,6 +3,7 @@ import ssl
 import smtplib
 import re
 from time import localtime, strftime
+import time
 import sys 
 import os
 import pymysql
@@ -28,7 +29,8 @@ import save_submission
 
 def run():
 	links = save_submission.get_links_that_dont_exist_in_submissions()
-	# if not links
+	if not links :
+		links = [{'url':'http://richardkeller.net'}]
 	# print(links)
 	for u in links :
 		# print(u['url'])
@@ -39,7 +41,11 @@ def run():
 		save_submission.save(title, url, html)
 	# run()
 
-run()
+# run()
+
+print("Start : %s" % time.ctime())
+time.sleep( 5 )
+print("End : %s" % time.ctime())
 
 # while count < 100
 # 	submit a url

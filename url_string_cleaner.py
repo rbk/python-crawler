@@ -29,6 +29,7 @@ def clean_domain(url) :
 	url = rm_first_slash(url)
 	url = rm_last_slash(url)
 	url = rm_protocol(url)
+	url = re.sub(r"\/(.*)",  '', url)
 	return url
 
 def valid_url(url) :
