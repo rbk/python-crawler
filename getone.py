@@ -41,6 +41,7 @@ a.execute('drop table if exists images')
 image_table = '''CREATE TABLE IF NOT EXISTS images (
 	`id` int auto_increment primary key,
 	`url` varchar(255) not null unique,
+	`size` varchar(255) not null,
 	`date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 	)'''
 a.execute(submission_table)
@@ -129,10 +130,14 @@ for image_url in images:
 	if not has_domain:
 		image_url = url + '/' + image_url
 	
-	print(image_url)
-		
+	# response = Request(image_url, headers=headers)
+	# imgdata = urlopen(response)
+	# size = imgdata.headers.get("content-length")
+	# size = float(size)/float(1000);
+	size = 'unknown'
+
 	try:
-		add_image = 'INSERT INTO images (url) VALUES ("'+image_url+'")'
+		add_image = 'INSERT INTO images (url, size) VALUES ("'+image_url+'", "'+size+'")'
 		a.execute(add_image)
 		conn.commit()
 	except:
