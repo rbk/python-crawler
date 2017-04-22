@@ -14,8 +14,6 @@ def get_page(url) :
 	if not url_man.valid_url(url) :
 		return 'Invalid url'
 
-
-
 	domain = url_man.clean_domain(url)
 	context = ssl._create_unverified_context()
 	ssl._create_default_https_context = ssl._create_unverified_context

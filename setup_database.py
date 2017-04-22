@@ -2,7 +2,7 @@
 import db_connection
 conn = db_connection.db_conn()
 
-print('>>> dropping all tables')
+# print('>>> dropping all tables')
 a = conn.cursor()
 # a.execute('create database s1')
 # a.execute('drop table if exists images')
