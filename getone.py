@@ -22,28 +22,37 @@ conn = pymysql.connect(
 	cursorclass=pymysql.cursors.DictCursor
 )
 a = conn.cursor()
-
+a.execute('drop table if exists images')
+a.execute('drop table if exists link_queue')
 a.execute('drop table if exists submissions')
+
 submission_table = '''CREATE TABLE IF NOT EXISTS submissions (
 	`id` int auto_increment primary key,
 	`url` varchar(255) not null,
 	`html` longtext not null,
 	`date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 )'''
-a.execute('drop table if exists link_queue')
-link_queue_table = '''CREATE TABLE IF NOT EXISTS link_queue (
+
+link_queue_table = '''
+	CREATE TABLE IF NOT EXISTS link_queue (
 	`id` int auto_increment primary key,
 	`url` varchar(255) not null unique,
+	`text` varchar(255),
+	`did` int not null,
 	`date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 	)'''
 
-a.execute('drop table if exists images')
-image_table = '''CREATE TABLE IF NOT EXISTS images (
+
+image_table = '''
+	CREATE TABLE IF NOT EXISTS images (
 	`id` int auto_increment primary key,
 	`url` varchar(255) not null unique,
 	`size` varchar(255) not null,
+	`alt` varchar(255),
+	`did` int not null,
 	`date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 	)'''
+
 a.execute(submission_table)
 a.execute(link_queue_table)
 a.execute(image_table)
@@ -79,11 +88,14 @@ add_submission = '''
 add_submission2 = 'INSERT INTO submissions (url, html) VALUES ("'+url+'", "'+html_escaped+'")'
 
 print('>>> save page')
-a.execute(add_submission2)
+domain_id = a.execute(add_submission2)
+domain_id = str(domain_id)
+print(type(domain_id))
 conn.commit()
 
 # a.execute(add_submission, (url, html))
 # conn.commit()
+
 
 # Get Links
 print('>>> get links')
@@ -92,9 +104,16 @@ for link in soup.find_all('a'):
 	links.append(link.get('href'))
 
 # print(links)
+# print(links)
+# 
+links_to_exlcude = [
+	'#',
+	'#content',
+	'tel:',
+	'mailto:'
+]
 
 for link in links:
-
 	domain_regex = '\/\/(?:[\w-]+\.)*([\w-]{1,63})(?:\.(?:\w{3}|\w{2}))'
 	has_domain = re.search(domain_regex, link)
 
@@ -105,19 +124,21 @@ for link in links:
 		link = re.sub(r"^\/",  '', link) # replace first slash
 		link = url + '/' + link
 
-	print(link) # DEBUG
-
+	# print(link) # DEBUG
 
 	if domain in link :
 		try:
-			add_link = 'INSERT INTO link_queue (url) VALUES ("'+link+'")'
-			a.execute(add_link)
+			add_link = 'INSERT INTO link_queue (`url`, `did`) VALUES ("'+link+'", "'+domain_id+'")'
+			q = a.execute(add_link)
 			conn.commit()
 		except:
 			'null'
 
 # Get images
 print('>>> get images')
+images_to_exclude = [
+	'facebook'
+]
 images = []
 for image in soup.find_all('img'):
 	images.append(image.get('src'))
@@ -130,16 +151,16 @@ for image_url in images:
 	if not has_domain:
 		image_url = url + '/' + image_url
 	
-	response = Request(image_url, headers=headers)
-	imgdata = urlopen(response)
-	size = imgdata.headers.get("content-length")
-	size = float(size)/float(1000);
+	# response = Request(image_url, headers=headers)
+	# imgdata = urlopen(response)
+	# size = imgdata.headers.get("content-length")
+	# size = float(size)/float(1000);
 	size = 'unknown'
 
-	print(image_url)
+	# print(image_url)
 
 	try:
-		add_image = 'INSERT INTO images (url, size) VALUES ("'+image_url+'", "'+size+'")'
+		add_image = 'INSERT INTO images (url, size, did) VALUES ("'+image_url+'", "'+size+'", "'+domain_id+'")'
 		a.execute(add_image)
 		conn.commit()
 	except:
