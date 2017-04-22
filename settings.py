@@ -6,12 +6,6 @@ def db_conf():
 	global dbpassword
 	global dbname
 
-def db_conn() :
-	conn = pymysql.connect(
-		host=settings.dbhost,
-		user=settings.dbuser,
-		password=settings.dbpassword,
-		db=settings.dbname,
-		charset='utf8mb4',
-		cursorclass=pymysql.cursors.DictCursor
-	)
+def regex():
+	global domain_regex
+	domain_regex = '(\/\/)(?:[\w-]+\.)*([\w-]{1,63})(?:\.(?:\w{3}|\w{2}))'

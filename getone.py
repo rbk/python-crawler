@@ -28,6 +28,7 @@ a.execute('drop table if exists submissions')
 
 submission_table = '''CREATE TABLE IF NOT EXISTS submissions (
 	`id` int auto_increment primary key,
+	`title` varchar(255) not null,
 	`url` varchar(255) not null,
 	`html` longtext not null,
 	`date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -65,7 +66,7 @@ a.execute(image_table)
 
 # url
 url1 = 'http://www.useragentstring.com/pages/useragentstring.php'
-url = 'http://richardkeller.net'
+url = 'https://mattsatv.com'
 url = re.sub(r"\/$",  '', url) # replace last slash
 domain = re.sub(r"http:\/\/|https:\/\/|\/\/", '', url)
 print(domain)
@@ -78,8 +79,8 @@ ssl._create_default_https_context = ssl._create_unverified_context
 agent1 = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'
 agent = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
 
-print('>>> user agent '  + agent1)
-headers={'User-Agent': agent1}
+print('>>> user agent '  + agent)
+headers={'User-Agent': agent}
 response = Request(url, headers=headers)
 html = urlopen(response).read().decode('utf8')
 html_escaped = re.escape(html)
@@ -89,7 +90,10 @@ add_submission = '''
 	INSERT INTO submissions (url, html)
 	VALUES ("%s","%s")
 '''
-add_submission2 = 'INSERT INTO submissions (url, html) VALUES ("'+url+'", "'+html_escaped+'")'
+
+
+page_title = soup.title.string
+add_submission2 = 'INSERT INTO submissions (title, url, html) VALUES ("'+page_title+'", "'+url+'", "'+html_escaped+'")'
 
 print('>>> save page')
 domain_id = a.execute(add_submission2)
@@ -99,6 +103,10 @@ conn.commit()
 
 # a.execute(add_submission, (url, html))
 # conn.commit()
+
+
+
+
 
 
 # Get Links
@@ -123,7 +131,7 @@ for link in links:
 
 	# print(has_domain)
 	if has_domain:
-			link = link
+			link = re.sub(r"\/$",  '', link) # replace last slash
 	else :
 		link = re.sub(r"^\/",  '', link) # replace first slash
 		link = url + '/' + link
