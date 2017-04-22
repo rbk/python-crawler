@@ -1,4 +1,8 @@
-README.md
+# README.md
+
+- Python 3.5.2
+- Flask
+- BeautifulSoup
 
 ### SQL to create first table
 

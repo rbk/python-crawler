@@ -43,10 +43,11 @@ def run():
 
 # run()
 
-print("Start : %s" % time.ctime())
-time.sleep( 5 )
-print("End : %s" % time.ctime())
+# print("Start : %s" % time.ctime())
+# time.sleep( 5 )
+# print("End : %s" % time.ctime())
 
+# Algorithm
 # while count < 100
 # 	submit a url
 # 	download all links and image
@@ -54,13 +55,16 @@ print("End : %s" % time.ctime())
 # 	submit url
 
 
-# result = curl.get_page('https://mattsatv.com/odes/assailant-800cc')
-# print(result['title'])
-# html = result['html']
-# url = result['url']
-# soup = BeautifulSoup(html, 'html.parser')
-# print(soup.title.string + ' - ' + result['url'])
+result = curl.get_page('https://mattsatv.com')
+if result :
+	print(result)
+else :
+	print('invalid url')
 
+# fomrmat results
+		# soup = BeautifulSoup(html, 'html.parser')
+		# title = soup.title.string
+		# html_escaped = re.escape(html)
 
 # 
 # for obj in soup.find_all('meta'):
