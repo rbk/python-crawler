@@ -69,7 +69,7 @@ def get_links(html, url):
 		'facebook',
 		'google',
 		'tel:',
-		'mailto:'
+		'mailto:',
 	]
 
 	domain = url_man.clean_domain(url)
