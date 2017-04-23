@@ -51,6 +51,15 @@ image_table = '''
   FOREIGN KEY(did) REFERENCES submissions(id)
 	)'''
 
+print('>>> creating links table')
+links_table = '''
+	CREATE TABLE IF NOT EXISTS links (
+	`id` int auto_increment,
+	`url` varchar(255) not null unique,
+	`date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	)'''
+
+a.execute(links_table)
 a.execute(submission_table)
 a.execute(domain_key_table)
 a.execute(link_queue_table)

@@ -4,7 +4,7 @@ import settings
 settings.db_conf()
 settings.dbhost = 'localhost'
 settings.dbuser = 'root'
-settings.dbpassword = 'password'
+settings.dbpassword = ''
 settings.dbname = 's1'
 
 app = Flask(__name__)

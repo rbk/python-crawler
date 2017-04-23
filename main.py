@@ -10,14 +10,14 @@ import pymysql
 import cgitb
 cgitb.enable()
 from urllib.request import Request, urlopen
-import url_string_cleaner as strop
+import url_string_cleaner as url_man
 # print('>>> ' + sys.version)
 
 import settings
 settings.db_conf()
 settings.dbhost = 'localhost'
 settings.dbuser = 'root'
-settings.dbpassword = 'password'
+settings.dbpassword = ''
 settings.dbname = 's1'
 
 # import setup_database
@@ -55,11 +55,60 @@ def run():
 # 	submit url
 
 
-result = curl.get_page('https://mattsatv.com')
-if result :
-	print(result)
-else :
-	print('invalid url')
+def get_links(html, url):
+
+	print('>>> getting links')
+
+	links = []
+
+	links_to_exlcude = [
+		'#',
+		'#content',
+	]
+	matches_to_exclude = [
+		'facebook',
+		'google',
+		'tel:',
+		'mailto:'
+	]
+
+	domain = url_man.clean_domain(url)
+	# print(domain)
+
+	soup = BeautifulSoup(html, 'html.parser')
+	for obj in soup.find_all('a'):
+		
+		href = obj.get('href')
+		match = False
+		correct_domain = False
+		not_in_array = False
+
+		if re.search(domain, href) :
+			correct_domain = True
+
+		for regex in matches_to_exclude :
+			if re.search(regex, href):
+				match = True
+				break
+
+		if href not in links :
+			not_in_array = True
+
+		if href not in links_to_exlcude and not match and correct_domain and not_in_array:
+			links.append(href)
+			print(href)
+	return links
+
+
+def init() :
+	url = 'https://mattsatv.com/'
+	html = curl.get_page(url)
+	if html :
+		get_links(html, url)
+
+init()
+
+# print(links)
 
 # fomrmat results
 		# soup = BeautifulSoup(html, 'html.parser')
