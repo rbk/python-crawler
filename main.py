@@ -83,6 +83,8 @@ def get_links(html, url):
 		correct_domain = False
 		not_in_array = False
 
+		# Limits to domain url passed in the beginning
+		# Exclude social networks instead
 		if re.search(domain, href) :
 			correct_domain = True
 
