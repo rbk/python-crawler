@@ -26,9 +26,9 @@ def rm_all_after_domain(url) :
 	return protocol + url
 
 def clean_domain(url) :
+	url = rm_protocol(url)
 	url = rm_first_slash(url)
 	url = rm_last_slash(url)
-	url = rm_protocol(url)
 	url = re.sub(r"\/(.*)",  '', url)
 	return url
 
