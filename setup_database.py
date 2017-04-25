@@ -2,7 +2,7 @@
 import db_connection
 conn = db_connection.db_conn()
 
-# print('>>> dropping all tables')
+print('>>> dropping all tables')
 a = conn.cursor()
 # a.execute('create database s1')
 # a.execute('drop table if exists images')
@@ -54,9 +54,9 @@ image_table = '''
 print('>>> creating links table')
 links_table = '''
 	CREATE TABLE IF NOT EXISTS links (
-	`id` int auto_increment,
+	`id` int auto_increment primary key,
 	`url` varchar(255) not null unique,
-	`date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 	)'''
 
 a.execute(links_table)

@@ -17,12 +17,14 @@ import settings
 settings.db_conf()
 settings.dbhost = 'localhost'
 settings.dbuser = 'root'
-settings.dbpassword = ''
+settings.dbpassword = 'password'
 settings.dbname = 's1'
 
 # import setup_database
 
-
+import db_connection
+conn = db_connection.db_conn()
+a = conn.cursor()
 
 import curl
 import save_submission
@@ -96,19 +98,48 @@ def get_links(html, url):
 		if href not in links :
 			not_in_array = True
 
-		if href not in links_to_exlcude and not match and correct_domain and not_in_array:
+		if href not in links_to_exlcude and not match and not_in_array:
 			links.append(href)
-			print(href)
+			try:
+				add_link = 'INSERT INTO links (`url`) VALUES ("'+href+'")'
+				q = a.execute(add_link)
+				conn.commit()
+				print('Success: ' + href)
+			except:
+				print('Not inserted: ' + href)
 	return links
+
+def crawl(links) :
+	print('crawl')
+	links = 'select url from links'
+	q = a.execute(links)
+	links = a.fetchall()
+
+	for link in links:
+		print(link['url'])
+		time.sleep(1)
+		try:
+			html = curl.get_page(link['url'])
+			if html:
+				print('yes')
+				links = get_links(html, link['url'])
+		except:
+			'null'
+
 
 
 def init() :
 	url = 'https://mattsatv.com/'
 	html = curl.get_page(url)
 	if html :
-		get_links(html, url)
+		links = get_links(html, url)
+		crawl(links)
+	else: 
+		print('invalid link')
 
 init()
+
+
 
 # print(links)
 
