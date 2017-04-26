@@ -33,43 +33,25 @@ def run():
 	links = save_submission.get_links_that_dont_exist_in_submissions()
 	if not links :
 		links = [{'url':'http://richardkeller.net'}]
-	# print(links)
 	for u in links :
-		# print(u['url'])
 		result = curl.get_page(u['url'])
 		html = result['html']
 		url = result['url']
 		title = result['title']
 		save_submission.save(title, url, html)
-	# run()
 
-# run()
-
-# print("Start : %s" % time.ctime())
-# time.sleep( 5 )
-# print("End : %s" % time.ctime())
-
-# Algorithm
-# while count < 100
-# 	submit a url
-# 	download all links and image
-# 	query links
-# 	submit url
 
 
 def get_links(html, url):
-
-	print('>>> getting links')
-
 	links = []
-
 	links_to_exlcude = [
 		'#',
 		'#content',
 	]
 	matches_to_exclude = [
-		'facebook',
-		'google',
+		'facebook.com',
+		'twitter.com'
+		'google.com',
 		'tel:',
 		'mailto:',
 	]
@@ -79,11 +61,22 @@ def get_links(html, url):
 
 	soup = BeautifulSoup(html, 'html.parser')
 	for obj in soup.find_all('a'):
+
 		
 		href = obj.get('href')
 		match = False
 		correct_domain = False
 		not_in_array = False
+
+		domain_regex = '\/\/(?:[\w-]+\.)*([\w-]{1,63})(?:\.(?:\w{3}|\w{2}))'
+		has_domain = re.search(domain_regex, href)
+
+		# NORMALIZE URL
+		if not has_domain:
+			# remove first slash
+			# remove last slash
+			# get domain protocol
+			href = domain + '/' +  href
 
 		# Limits to domain url passed in the beginning
 		# Exclude social networks instead
@@ -110,26 +103,24 @@ def get_links(html, url):
 	return links
 
 def crawl(links) :
-	print('crawl')
 	links = 'select url from links'
 	q = a.execute(links)
 	links = a.fetchall()
 
 	for link in links:
-		print(link['url'])
-		time.sleep(1)
+		# time.sleep(1)
 		try:
 			html = curl.get_page(link['url'])
 			if html:
-				print('yes')
 				links = get_links(html, link['url'])
 		except:
 			'null'
-
+	crawl(links)
 
 
 def init() :
-	url = 'https://mattsatv.com/'
+	url = 'https://www.cliniciansbrief.com'
+	url = 'https://www.visitorkit.com/'
 	html = curl.get_page(url)
 	if html :
 		links = get_links(html, url)
