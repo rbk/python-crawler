@@ -20,7 +20,8 @@ def get_page(url) :
 	headers={'User-Agent': user_agents.get_one(0)}
 	try:
 		response = Request(url, headers=headers)
-		html = urlopen(response).read().decode('utf8')
+		html = urlopen(response).read()
+		# .decode('utf8')
 		return html
-	except urllib.error.URLError as e:
-		return False
+	except:
+		'null'

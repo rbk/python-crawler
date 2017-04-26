@@ -32,9 +32,27 @@ def clean_domain(url) :
 	url = re.sub(r"\/(.*)",  '', url)
 	return url
 
-def valid_url(url) :
+def valid_url(url):
 	potential_url = re.search(settings.domain_regex, url)
 	if hasattr(potential_url, 'group') :
 		return True
 	else :
 		return False
+
+def does_not_match(url):
+	matches_to_exclude = [
+		'facebook.com',
+		'twitter.com',
+		'google.com',
+		'tel:',
+		'mailto:',
+		'goo.gl',
+		'wikipedia.org',
+		'instagram.com'
+	]
+	for regex in matches_to_exclude:
+		match = re.search(regex, url)
+		if hasattr(match, 'group'):
+			return False
+
+	return True

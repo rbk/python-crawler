@@ -20,8 +20,7 @@ settings.dbuser = 'root'
 settings.dbpassword = 'password'
 settings.dbname = 's1'
 
-# import setup_database
-
+import setup_database
 import db_connection
 conn = db_connection.db_conn()
 a = conn.cursor()
@@ -43,6 +42,7 @@ def run():
 
 
 def get_links(html, url):
+	
 	links = []
 	links_to_exlcude = [
 		'#',
@@ -55,43 +55,50 @@ def get_links(html, url):
 		'tel:',
 		'mailto:',
 	]
-
-	domain = url_man.clean_domain(url)
+	domain_clean = url_man.clean_domain(url)
+	protocol = re.search(r"http:\/\/|https:\/\/|\/\/", url)
+	if hasattr(protocol, 'group'):
+		protocol = protocol.group(0)
+	else: 
+		protocol = 'http://'
 	# print(domain)
 
 	soup = BeautifulSoup(html, 'html.parser')
 	for obj in soup.find_all('a'):
-
-		
 		href = obj.get('href')
+
 		match = False
 		correct_domain = False
 		not_in_array = False
+		
 
 		domain_regex = '\/\/(?:[\w-]+\.)*([\w-]{1,63})(?:\.(?:\w{3}|\w{2}))'
 		has_domain = re.search(domain_regex, href)
+		
+		for regex in matches_to_exclude :
+			if re.search(regex, href):
+				print('REGEX: ' + regex + ' URL: ' + href)
+				match = True
+				break
 
 		# NORMALIZE URL
-		if not has_domain:
-			# remove first slash
-			# remove last slash
-			# get domain protocol
-			href = domain + '/' +  href
+		if not has_domain and not match:
+			href = url_man.rm_first_slash(href);
+			href = protocol + domain_clean + '/' +  href
 
 		# Limits to domain url passed in the beginning
 		# Exclude social networks instead
-		if re.search(domain, href) :
+		if re.search(domain_clean, href) :
 			correct_domain = True
-
-		for regex in matches_to_exclude :
-			if re.search(regex, href):
-				match = True
-				break
 
 		if href not in links :
 			not_in_array = True
 
-		if href not in links_to_exlcude and not match and not_in_array:
+		href = url_man.rm_last_slash(href)
+		# print(href)
+
+		if href not in links_to_exlcude and not_in_array and not match:
+			print(href)
 			links.append(href)
 			try:
 				add_link = 'INSERT INTO links (`url`) VALUES ("'+href+'")'
@@ -100,7 +107,15 @@ def get_links(html, url):
 				print('Success: ' + href)
 			except:
 				print('Not inserted: ' + href)
+
+	# crawl(links)
 	return links
+
+
+
+
+
+	
 
 def crawl(links) :
 	links = 'select url from links'
@@ -108,27 +123,25 @@ def crawl(links) :
 	links = a.fetchall()
 
 	for link in links:
-		# time.sleep(1)
 		try:
 			html = curl.get_page(link['url'])
 			if html:
 				links = get_links(html, link['url'])
 		except:
 			'null'
-	crawl(links)
+
+	# time.sleep(1)		
+	# crawl(links)
 
 
-def init() :
-	url = 'https://www.cliniciansbrief.com'
-	url = 'https://www.visitorkit.com/'
+def run(url) :
 	html = curl.get_page(url)
 	if html :
 		links = get_links(html, url)
-		crawl(links)
 	else: 
 		print('invalid link')
 
-init()
+run('https://www.visitorkit.com/')
 
 
 

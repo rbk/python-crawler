@@ -1,14 +1,27 @@
-
-import db_connection
-conn = db_connection.db_conn()
-
-print('>>> dropping all tables')
+import pymysql
+conn = pymysql.connect(
+	host='localhost',
+	user='root',
+	password='password',
+	charset='utf8mb4',
+	cursorclass=pymysql.cursors.DictCursor
+)
+print('>>> DROP DATABASE')
 a = conn.cursor()
-# a.execute('create database s1')
-# a.execute('drop table if exists images')
-# a.execute('drop table if exists link_queue')
-# a.execute('drop table if exists submissions')
-# a.execute('drop table if exists domain_key')
+a.execute('drop database if exists s1')
+conn.commit()
+
+print('>>> CREATE DATABASE')
+a.execute('create database s1')
+conn = pymysql.connect(
+	host='localhost',
+	user='root',
+	password='password',
+	db='s1',
+	charset='utf8mb4',
+	cursorclass=pymysql.cursors.DictCursor
+)
+a = conn.cursor()
 
 print('>>> creating submissions table')
 submission_table = '''CREATE TABLE IF NOT EXISTS submissions (
@@ -59,7 +72,16 @@ links_table = '''
 	`date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 	)'''
 
+print('>>> creating fetched table')
+fetched_table = '''
+	CREATE TABLE IF NOT EXISTS fetched (
+	`id` int auto_increment primary key,
+	`link_id` varchar(255) not null unique,
+	`date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+	)'''
+
 a.execute(links_table)
+a.execute(fetched_table)
 a.execute(submission_table)
 a.execute(domain_key_table)
 a.execute(link_queue_table)
