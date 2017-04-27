@@ -21,7 +21,7 @@ def get_page(url) :
 	try:
 		response = Request(url, headers=headers)
 		html = urlopen(response).read()
-		# .decode('utf8')
+		# .decode('utf8') # Use for saving html to database
 		return html
 	except:
 		'null'

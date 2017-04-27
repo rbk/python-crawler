@@ -7,12 +7,10 @@ import time
 import sys 
 import os
 import pymysql
-# import cgitb
-# cgitb.enable()
 from urllib.request import Request, urlopen
 import url_string_cleaner as url_man
-# print('>>> ' + sys.version)
 
+# Database Setup
 import settings
 settings.db_conf()
 settings.dbhost = 'localhost'
@@ -21,24 +19,14 @@ settings.dbpassword = 'password'
 settings.dbname = 's1'
 
 # import setup_database
+
 import db_connection
 conn = db_connection.db_conn()
 a = conn.cursor()
 
+
 import curl
 import save_submission
-
-def run():
-	links = save_submission.get_links_that_dont_exist_in_submissions()
-	if not links :
-		links = [{'url':'http://richardkeller.net'}]
-	for u in links :
-		result = curl.get_page(u['url'])
-		html = result['html']
-		url = result['url']
-		title = result['title']
-		save_submission.save(title, url, html)
-
 
 
 def get_links(html, url):
@@ -166,42 +154,6 @@ def crawl(url) :
 			except:
 				'null'
 
-	# time.sleep(1)		
-	# crawl(links)
-
 crawl('https://www.reddit.com/')
-
-def run(url) :
-	html = curl.get_page(url)
-	if html :
-		links = get_links(html, url)
-	else: 
-		print('invalid link')
-
-# run('https://www.reddit.com/')
-
-
-
-# print(links)
-
-# fomrmat results
-		# soup = BeautifulSoup(html, 'html.parser')
-		# title = soup.title.string
-		# html_escaped = re.escape(html)
-
-# 
-# for obj in soup.find_all('meta'):
-# 	# print(obj)
-# 	property = obj.get('property')
-# 	if property == 'og:image' or property == 'og:description' :
-# 		print(obj.get('content'))
-# 	name = obj.get('name')
-# 	if name == 'description' :
-# 		print(obj.get('content'))
-
-# save_submission.save('string')
-
-# html_escaped = re.escape(html)
-# soup = BeautifulSoup(html, 'html.parser')
 
 
