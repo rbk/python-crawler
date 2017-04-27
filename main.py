@@ -7,8 +7,8 @@ import time
 import sys 
 import os
 import pymysql
-import cgitb
-cgitb.enable()
+# import cgitb
+# cgitb.enable()
 from urllib.request import Request, urlopen
 import url_string_cleaner as url_man
 # print('>>> ' + sys.version)
@@ -20,7 +20,7 @@ settings.dbuser = 'root'
 settings.dbpassword = 'password'
 settings.dbname = 's1'
 
-import setup_database
+# import setup_database
 import db_connection
 conn = db_connection.db_conn()
 a = conn.cursor()
@@ -54,6 +54,7 @@ def get_links(html, url):
 		'google.com',
 		'tel:',
 		'mailto:',
+		'javascript:'
 	]
 	domain_clean = url_man.clean_domain(url)
 	protocol = re.search(r"http:\/\/|https:\/\/|\/\/", url)
@@ -67,6 +68,9 @@ def get_links(html, url):
 	for obj in soup.find_all('a'):
 		href = obj.get('href')
 
+		if not href:
+			href = ''
+
 		match = False
 		correct_domain = False
 		not_in_array = False
@@ -74,10 +78,14 @@ def get_links(html, url):
 
 		domain_regex = '\/\/(?:[\w-]+\.)*([\w-]{1,63})(?:\.(?:\w{3}|\w{2}))'
 		has_domain = re.search(domain_regex, href)
+		if hasattr(has_domain, 'group'):
+			has_domain = True
+		else:
+			has_domain = False
 		
 		for regex in matches_to_exclude :
 			if re.search(regex, href):
-				print('REGEX: ' + regex + ' URL: ' + href)
+				# print('REGEX: ' + regex + ' URL: ' + href)
 				match = True
 				break
 
@@ -98,41 +106,68 @@ def get_links(html, url):
 		# print(href)
 
 		if href not in links_to_exlcude and not_in_array and not match:
-			print(href)
+			# print(href)
 			links.append(href)
 			try:
 				add_link = 'INSERT INTO links (`url`) VALUES ("'+href+'")'
 				q = a.execute(add_link)
 				conn.commit()
 				print('Success: ' + href)
+				counter = counter + 1
 			except:
+				'null'
 				print('Not inserted: ' + href)
+			
+			try:
+				domain = url_man.clean_domain(href)
+				add_domain = 'INSERT INTO domain (`domain`) VALUES ("'+domain+'")'
+				q = a.execute(add_domain)
+				conn.commit()
+				print('Domain added: ' + domain)
+			except:
+				'null'
 
-	# crawl(links)
 	return links
 
-
-
-
-
-	
-
-def crawl(links) :
+def crawl(url) :
+	global counter
+	counter = 0
+	max_count = 1000
 	links = 'select url from links'
-	q = a.execute(links)
+	db_count = a.execute(links)
 	links = a.fetchall()
+	links_array = []
 
-	for link in links:
+	if db_count == 0:
 		try:
-			html = curl.get_page(link['url'])
+			html = curl.get_page(url)
 			if html:
-				links = get_links(html, link['url'])
+				links = get_links(html, url)
+				for link in links:
+					links_array.append(link['url'])
 		except:
 			'null'
+	else :
+		for link in links:
+			links_array.append(link['url'])
+			# print(link['url'])
+		# exit()
+
+	while counter < max_count:
+		for link in links_array:
+			try:
+				html = curl.get_page(link)
+				if html:
+					links = get_links(html, link)
+					for link in links:
+						links_array.append(link['url'])
+			except:
+				'null'
 
 	# time.sleep(1)		
 	# crawl(links)
 
+crawl('https://www.reddit.com/')
 
 def run(url) :
 	html = curl.get_page(url)
@@ -141,7 +176,7 @@ def run(url) :
 	else: 
 		print('invalid link')
 
-run('https://www.visitorkit.com/')
+# run('https://www.reddit.com/')
 
 
 

@@ -80,6 +80,16 @@ fetched_table = '''
 	`date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 	)'''
 
+
+print('>>> creating domain table')
+domain_table = '''
+	CREATE TABLE IF NOT EXISTS domain (
+	`id` int auto_increment primary key,
+	`domain` varchar(255) not null unique,
+	`date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+	)'''
+
+a.execute(domain_table)
 a.execute(links_table)
 a.execute(fetched_table)
 a.execute(submission_table)
