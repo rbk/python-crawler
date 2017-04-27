@@ -140,6 +140,7 @@ def crawl(url) :
 
 	if db_count == 0:
 		try:
+			print('Trying...' + url)
 			html = curl.get_page(url)
 			if html:
 				links = get_links(html, url)
@@ -156,6 +157,7 @@ def crawl(url) :
 	while counter < max_count:
 		for link in links_array:
 			try:
+				print('Trying...' + link)
 				html = curl.get_page(link)
 				if html:
 					links = get_links(html, link)
