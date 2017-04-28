@@ -42,15 +42,31 @@ def get_links(html, url):
 		'google.com',
 		'tel:',
 		'mailto:',
-		'javascript:'
+		'javascript:',
+		'ftp:\/\/',
+		'\/\/goo.gl',
+		'\/\/(\*).wikipedia.org',
+		'(\.gifv$)',
+		'http:\/\/imgur\.com',
+		'http:\/\/i\.imgur\.com',
+		'(pdf)$',
+		'(gif)$',
+		'(gifv)$',
+		'(jpg)$',
+		'(png)$',
 	]
+
 	domain_clean = url_man.clean_domain(url)
 	protocol = re.search(r"http:\/\/|https:\/\/|\/\/", url)
 	if hasattr(protocol, 'group'):
+		print("'"+protocol.group(0)+"'")
 		protocol = protocol.group(0)
 	else: 
 		protocol = 'http://'
-	# print(domain)
+
+	no_http = re.search(r"http:\/\/|https:\/\/", url)
+	if not hasattr(no_http, 'group'):
+		url = 'https:' +url
 
 	soup = BeautifulSoup(html, 'html.parser')
 	for obj in soup.find_all('a'):
@@ -72,8 +88,8 @@ def get_links(html, url):
 			has_domain = False
 		
 		for regex in matches_to_exclude :
-			if re.search(regex, href):
-				# print('REGEX: ' + regex + ' URL: ' + href)
+			exclude_match = re.search(regex, href)
+			if hasattr(exclude_match, 'group'):
 				match = True
 				break
 
