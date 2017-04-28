@@ -20,11 +20,7 @@ matches_to_exclude = [
 	'(png)$',
 ]
 
-# http://i.imgifvur.com/5bzjxSR.gifv
-# http://i.imgur.com/5bzjxSR.gif
-# http://i.imgur.com/5bzjxSR.jpg
-# http://i.imgur.com/5bzjxSR.pdf
-# gifvhttp://imgur.com/a/5AYF6 
+
 
 href = 'http://i.imgifvur.com/5bzjxSR.gifv'
 

@@ -57,15 +57,14 @@ def get_links(html, url):
 	]
 
 	domain_clean = url_man.clean_domain(url)
-	protocol = re.search(r"http:\/\/|https:\/\/|\/\/", url)
-	if hasattr(protocol, 'group'):
-		print("'"+protocol.group(0)+"'")
-		protocol = protocol.group(0)
+	has_protocol = re.search(r"http:\/\/|https:\/\/|\/\/", url)
+	if hasattr(has_protocol, 'group'):
+		protocol = has_protocol.group(0)
 	else: 
 		protocol = 'http://'
 
 	no_http = re.search(r"http:\/\/|https:\/\/", url)
-	if not hasattr(no_http, 'group'):
+	if not hasattr(no_http, 'group') and hasattr(has_protocol, 'group'):
 		url = 'https:' +url
 
 	soup = BeautifulSoup(html, 'html.parser')
@@ -116,11 +115,12 @@ def get_links(html, url):
 				add_link = 'INSERT INTO links (`url`) VALUES ("'+href+'")'
 				q = a.execute(add_link)
 				conn.commit()
-				print('Success: ' + href)
+				print('SAVED: ' + href)
+				# print('[' + counter + '] Success: ' + href)
 				counter = counter + 1
 			except:
+				print('EXISTS PROBABLY: ' + href)
 				'null'
-				print('Not inserted: ' + href)
 			
 			try:
 				domain = url_man.clean_domain(href)
@@ -137,39 +137,22 @@ def crawl(url) :
 	global counter
 	counter = 0
 	max_count = 1000
-	links = 'select url from links'
-	db_count = a.execute(links)
-	links = a.fetchall()
-	links_array = []
+	links_array = [url]
 
-	if db_count == 0:
+	for link in links_array:
 		try:
-			print('Trying...' + url)
-			html = curl.get_page(url)
+			print('Trying...' + link)
+			html = curl.get_page(link)
+			# print(html)
 			if html:
-				links = get_links(html, url)
-				for link in links:
-					links_array.append(link['url'])
+				new_links = get_links(html, link)
+				# print(len(new_links))
+				for new_link in new_links:
+					if new_link not in links_array:
+						links_array.append(new_link)
 		except:
 			'null'
-	else :
-		for link in links:
-			links_array.append(link['url'])
-			# print(link['url'])
-		# exit()
 
-	while counter < max_count:
-		for link in links_array:
-			try:
-				print('Trying...' + link)
-				html = curl.get_page(link)
-				if html:
-					links = get_links(html, link)
-					for link in links:
-						links_array.append(link['url'])
-			except:
-				'null'
-
-crawl('https://www.reddit.com/')
+crawl('http://dmoztools.net/')
 
 
