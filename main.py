@@ -9,6 +9,7 @@ import os
 import pymysql
 from urllib.request import Request, urlopen
 import url_string_cleaner as url_man
+from multiprocessing import Pool as ThreadPool 
 
 # Database Setup
 import settings
@@ -37,9 +38,13 @@ def get_links(html, url):
 		'#content',
 	]
 	matches_to_exclude = [
-		'facebook.com',
-		'twitter.com'
-		'google.com',
+		'microsoftstore\.com',
+		'market\.android\.com',
+		'l\.messenger\.com',
+		'itunes\.apple\.com',
+		'facebook\.com',
+		'twitter\.com',
+		'google\.com',
 		'tel:',
 		'mailto:',
 		'javascript:',
@@ -86,12 +91,6 @@ def get_links(html, url):
 		else:
 			has_domain = False
 		
-		for regex in matches_to_exclude :
-			exclude_match = re.search(regex, href)
-			if hasattr(exclude_match, 'group'):
-				match = True
-				break
-
 		# NORMALIZE URL
 		if not has_domain and not match:
 			href = url_man.rm_first_slash(href);
@@ -108,7 +107,15 @@ def get_links(html, url):
 		href = url_man.rm_last_slash(href)
 		# print(href)
 
-		if href not in links_to_exlcude and not_in_array and not match:
+		for regex in matches_to_exclude :
+			exclude_match = re.search(regex, href)
+			if hasattr(exclude_match, 'group'):
+				match = True
+				break
+
+		# print(href + '??MATCH?? - ' + str(match))
+
+		if href not in links_to_exlcude and not match:
 			# print(href)
 			links.append(href)
 			try:
@@ -119,7 +126,7 @@ def get_links(html, url):
 				# print('[' + counter + '] Success: ' + href)
 				counter = counter + 1
 			except:
-				print('EXISTS PROBABLY: ' + href)
+				# print('EXISTS PROBABLY: ' + href)
 				'null'
 			
 			try:
@@ -127,7 +134,7 @@ def get_links(html, url):
 				add_domain = 'INSERT INTO domain (`domain`) VALUES ("'+domain+'")'
 				q = a.execute(add_domain)
 				conn.commit()
-				print('Domain added: ' + domain)
+				# print('Domain added: ' + domain)
 			except:
 				'null'
 
@@ -141,7 +148,7 @@ def crawl(url) :
 
 	for link in links_array:
 		try:
-			print('Trying...' + link)
+			# print('Trying...' + link)
 			html = curl.get_page(link)
 			# print(html)
 			if html:
@@ -153,6 +160,15 @@ def crawl(url) :
 		except:
 			'null'
 
-crawl('http://dmoztools.net/')
-
+urls = [
+	'http://dmoztools.net/',
+	'https://www.visitorkit.com/',
+	'https://twitter.com/',
+	'https://facebook.com/',
+	'https://nytimes.com/',
+]
+pool = ThreadPool(4)
+results = pool.map(crawl, urls)
+pool.close() 
+pool.join() 
 

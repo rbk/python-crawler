@@ -19,7 +19,7 @@ def get_page(url) :
 	headers={'User-Agent': user_agents.get_one(0)}
 	try:
 		request = Request(url, headers=headers)
-		response = urlopen(request, timeout=3)
+		response = urlopen(request, timeout=1)
 		# print(response.getcode())
 		return response.read()
 		# .decode('utf8') # Use for saving html to database
