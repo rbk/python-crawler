@@ -13,11 +13,11 @@ matches_to_exclude = [
 	'(\.gifv$)',
 	'http:\/\/imgur\.com',
 	'http:\/\/i\.imgur\.com',
-	'(pdf)$',
-	'(gif)$',
-	'(gifv)$',
-	'(jpg)$',
-	'(png)$',
+	# '(pdf)$',
+	# '(gif)$',
+	# '(gifv)$',
+	# '(jpg)$',
+	# '(png)$',
 ]
 
 
@@ -30,7 +30,7 @@ fb1 = 'https://zh-cn.facebook.com/pages/create/?ref_type=registration_form' # ??
 fb2 = 'https://facebook.com/login' # ??MATCH?? - False
 
 for regex in matches_to_exclude :
-	exclude_match = re.search(regex, fb1)
+	exclude_match = re.search(regex, href)
 	if hasattr(exclude_match, 'group'):
 		print('MATCHED - EXCLUDE')
 		match = True

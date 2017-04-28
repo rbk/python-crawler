@@ -48,15 +48,14 @@ def get_links(html, url):
 		'ftp:\/\/',
 		'\/\/goo.gl',
 		'\/\/(\*).wikipedia.org',
-		'(\.gifv$)',
 		'http:\/\/imgur\.com',
 		'http:\/\/i\.imgur\.com',
 		'(\.pdf)$',
-		'(.\gif)$',
-		'(.\gifv)$',
-		'(.\jpg)$',
-		'(.\png)$',
-		'(.\png)$',
+		'(\.gif)$',
+		'(\.gifv)$',
+		'(\.jpg)$',
+		'(\.png)$',
+		'(\.png)$',
 	]
 
 	domain_clean = url_man.clean_domain(url)
@@ -113,7 +112,7 @@ def get_links(html, url):
 
 		# print(href + '??MATCH?? - ' + str(match))
 
-		if href not in links_to_exlcude and not match:
+		if not match:
 			# print(href)
 			links.append(href)
 			try:
@@ -162,7 +161,7 @@ def crawl(url) :
 urls = [
 	'http://dmoztools.net/',
 	'https://nytimes.com/',
-	'https://reddit.com'
+	'https://reddit.com',
 ]
 pool = ThreadPool(4)
 results = pool.map(crawl, urls)
