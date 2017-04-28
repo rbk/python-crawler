@@ -33,10 +33,7 @@ import save_submission
 def get_links(html, url):
 	
 	links = []
-	links_to_exlcude = [
-		'#',
-		'#content',
-	]
+
 	matches_to_exclude = [
 		'microsoftstore\.com',
 		'market\.android\.com',
@@ -54,11 +51,12 @@ def get_links(html, url):
 		'(\.gifv$)',
 		'http:\/\/imgur\.com',
 		'http:\/\/i\.imgur\.com',
-		'(pdf)$',
-		'(gif)$',
-		'(gifv)$',
-		'(jpg)$',
-		'(png)$',
+		'(\.pdf)$',
+		'(.\gif)$',
+		'(.\gifv)$',
+		'(.\jpg)$',
+		'(.\png)$',
+		'(.\png)$',
 	]
 
 	domain_clean = url_man.clean_domain(url)
@@ -141,6 +139,7 @@ def get_links(html, url):
 	return links
 
 def crawl(url) :
+
 	global counter
 	counter = 0
 	max_count = 1000
