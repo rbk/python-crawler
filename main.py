@@ -162,10 +162,8 @@ def crawl(url) :
 
 urls = [
 	'http://dmoztools.net/',
-	'https://www.visitorkit.com/',
-	'https://twitter.com/',
-	'https://facebook.com/',
 	'https://nytimes.com/',
+	'https://reddit.com'
 ]
 pool = ThreadPool(4)
 results = pool.map(crawl, urls)
