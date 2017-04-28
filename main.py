@@ -35,6 +35,7 @@ def get_links(html, url):
 	links = []
 
 	matches_to_exclude = [
+		'youtu\.be',
 		'microsoftstore\.com',
 		'market\.android\.com',
 		'l\.messenger\.com',
@@ -54,8 +55,9 @@ def get_links(html, url):
 		'(\.gif)$',
 		'(\.gifv)$',
 		'(\.jpg)$',
+		'(\.jpeg)$',
 		'(\.png)$',
-		'(\.png)$',
+		'(\.svg)$',
 	]
 
 	domain_clean = url_man.clean_domain(url)
