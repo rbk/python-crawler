@@ -69,6 +69,7 @@ links_table = '''
 	CREATE TABLE IF NOT EXISTS links (
 	`id` int auto_increment primary key,
 	`url` varchar(255) not null unique,
+	`title` varchar(255),
 	`date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 	)'''
 

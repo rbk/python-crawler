@@ -42,13 +42,13 @@ def get_links(html, url):
 		'itunes\.apple\.com',
 		'facebook\.com',
 		'twitter\.com',
-		'google\.com',
+		# 'google\.com',
 		'tel:',
 		'mailto:',
 		'javascript:',
 		'ftp:\/\/',
 		'\/\/goo.gl',
-		'\/\/(\*).wikipedia.org',
+		# '\/\/(\*).wikipedia.org',
 		'http:\/\/imgur\.com',
 		'http:\/\/i\.imgur\.com',
 		'(\.pdf)$',
@@ -147,25 +147,32 @@ def crawl(url) :
 	links_array = [url]
 
 	for link in links_array:
+
 		try:
-			# print('Trying...' + link)
-			html = curl.get_page(link)
-			# print(html)
-			if html:
-				new_links = get_links(html, link)
-				# print(len(new_links))
-				for new_link in new_links:
-					if new_link not in links_array:
-						links_array.append(new_link)
+			# Check link before crawling
+			# check_link = 'SELECT url FROM links WHERE url ="'+link+'"'
+			# already_fetched = a.execute(check_link)
+			already_fetched = False
+			if not already_fetched :
+				html = curl.get_page(link)
+				if html:
+					new_links = get_links(html, link)
+					# print(len(new_links))
+					for new_link in new_links:
+						if new_link not in links_array:
+							links_array.append(new_link)
 		except:
 			'null'
 
 urls = [
-	'http://dmoztools.net/',
 	'https://nytimes.com/',
 	'https://reddit.com',
+	'https://amazon.com',
+	'https://yahoo.com',
+	'https://wired.com',
+	'https://techcrunch.com',
 ]
-pool = ThreadPool(4)
+pool = ThreadPool(2)
 results = pool.map(crawl, urls)
 pool.close() 
 pool.join() 
