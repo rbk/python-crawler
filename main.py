@@ -1,37 +1,34 @@
 from bs4 import BeautifulSoup
+from time import localtime, strftime
+from urllib.request import Request, urlopen
+from multiprocessing import Pool as ThreadPool
+
 import ssl
 import smtplib
 import re
-from time import localtime, strftime
 import time
-import sys 
+import sys
 import os
 import pymysql
-from urllib.request import Request, urlopen
-import url_string_cleaner as url_man
-from multiprocessing import Pool as ThreadPool 
+
+import pythoncrawler.settings
+import pythoncrawler.url_string_cleaner as url_man
+import pythoncrawler.curl
+import pythoncrawler.save_submission
+import pythoncrawler.db_connection
 
 # Database Setup
-import settings
 settings.db_conf()
 settings.dbhost = 'localhost'
 settings.dbuser = 'root'
 settings.dbpassword = 'password'
 settings.dbname = 's1'
 
-# import setup_database
-
-import db_connection
 conn = db_connection.db_conn()
 a = conn.cursor()
 
-
-import curl
-import save_submission
-
-
 def get_links(html, url):
-	
+
 	links = []
 
 	matches_to_exclude = [
@@ -64,7 +61,7 @@ def get_links(html, url):
 	has_protocol = re.search(r"http:\/\/|https:\/\/|\/\/", url)
 	if hasattr(has_protocol, 'group'):
 		protocol = has_protocol.group(0)
-	else: 
+	else:
 		protocol = 'http://'
 
 	no_http = re.search(r"http:\/\/|https:\/\/", url)
@@ -81,7 +78,7 @@ def get_links(html, url):
 		match = False
 		correct_domain = False
 		not_in_array = False
-		
+
 
 		domain_regex = '\/\/(?:[\w-]+\.)*([\w-]{1,63})(?:\.(?:\w{3}|\w{2}))'
 		has_domain = re.search(domain_regex, href)
@@ -89,7 +86,7 @@ def get_links(html, url):
 			has_domain = True
 		else:
 			has_domain = False
-		
+
 		# NORMALIZE URL
 		if not has_domain and not match:
 			href = url_man.rm_first_slash(href);
@@ -127,7 +124,7 @@ def get_links(html, url):
 			except:
 				# print('EXISTS PROBABLY: ' + href)
 				'null'
-			
+
 			try:
 				domain = url_man.clean_domain(href)
 				add_domain = 'INSERT INTO domain (`domain`) VALUES ("'+domain+'")'
@@ -174,6 +171,5 @@ urls = [
 ]
 pool = ThreadPool(2)
 results = pool.map(crawl, urls)
-pool.close() 
-pool.join() 
-
+pool.close()
+pool.join()
