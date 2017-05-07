@@ -2,9 +2,9 @@
 # encoding=utf8
 
 import re
-import settings
+import regex
 
-settings.regex();
+regex.regex();
 
 def rm_first_slash(url) :
 	return re.sub(r"^\/",  '', url)

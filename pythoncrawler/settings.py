@@ -6,6 +6,8 @@ def db_conf():
 	global dbpassword
 	global dbname
 
-def regex():
-	global domain_regex
-	domain_regex = '(\/\/)(?:[\w-]+\.)*([\w-]{1,63})(?:\.(?:\w{3}|\w{2}))'
+db_conf()
+settings.dbhost = 'localhost'
+settings.dbuser = 'root'
+settings.dbpassword = ''
+settings.dbname = 's1'

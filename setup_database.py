@@ -1,8 +1,10 @@
 import pymysql
+import pythoncrawler.settings
+
 conn = pymysql.connect(
-	host='localhost',
-	user='root',
-	password='password',
+	host=settings.dbhost,
+	user=settings.dbuser,
+	password=settings.dbpassword,
 	charset='utf8mb4',
 	cursorclass=pymysql.cursors.DictCursor
 )
@@ -14,9 +16,9 @@ conn.commit()
 print('>>> CREATE DATABASE')
 a.execute('create database s1')
 conn = pymysql.connect(
-	host='localhost',
-	user='root',
-	password='password',
+	host=settings.dbhost,
+	user=settings.dbuser,
+	password=settings.dbpassword,
 	db='s1',
 	charset='utf8mb4',
 	cursorclass=pymysql.cursors.DictCursor
