@@ -1,8 +1,10 @@
 from bs4 import BeautifulSoup
-import url_string_cleaner as url_man
 import re
-import db_connection
-conn = db_connection.db_conn()
+
+import pythoncrawler.url_string_cleaner as url_man
+from pythoncrawler.db_connection import *
+
+conn = db_conn()
 a = conn.cursor()
 
 def get_links_that_dont_exist_in_submissions():
@@ -20,7 +22,7 @@ def save(title, url, html) :
 	if title and url and html :
 		print(title)
 		html_escaped = re.escape(html)
-		
+
 		add_submission = 'INSERT INTO submissions (title, url, html) VALUES ("'+title+'", "'+url+'", "'+html_escaped+'")'
 		id = a.execute(add_submission)
 
@@ -36,14 +38,14 @@ def add_links(title, url, html, domain_id) :
 	print('>>> get links')
 	links = []
 	soup = BeautifulSoup(html, 'html.parser')
-	
+
 	links_to_exlcude = [
 		'#',
 		'#content',
 		'tel:',
 		'mailto:'
 	]
-	
+
 	for link in soup.find_all('a'):
 		href = link.get('href')
 		if href not in links_to_exlcude :
@@ -52,7 +54,7 @@ def add_links(title, url, html, domain_id) :
 
 	# print(links)
 	# print(links)
-	# 
+	#
 
 	for link in links:
 		domain_regex = '\/\/(?:[\w-]+\.)*([\w-]{1,63})(?:\.(?:\w{3}|\w{2}))'

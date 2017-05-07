@@ -4,7 +4,7 @@
 import re
 import regex
 
-regex.regex();
+domain_regex = '(\/\/)(?:[\w-]+\.)*([\w-]{1,63})(?:\.(?:\w{3}|\w{2}))'
 
 def rm_first_slash(url) :
 	return re.sub(r"^\/",  '', url)
@@ -33,8 +33,9 @@ def clean_domain(url) :
 	return url
 
 def valid_url(url):
-	potential_url = re.search(settings.domain_regex, url)
+	potential_url = re.search(domain_regex, url)
 	if hasattr(potential_url, 'group') :
+		print(url)
 		return True
 	else :
 		return False

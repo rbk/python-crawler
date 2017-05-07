@@ -6,6 +6,7 @@ Just building a web crawler in python for fun...
 - Flask
 - BeautifulSoup
 - PyMysql
+- regex
 
 ## Todo
 - Filter Social Media Networks
@@ -20,4 +21,4 @@ Just building a web crawler in python for fun...
 
 ## Get Started
 - Create a `pythoncrawler/settings.py` using the `pythoncrawler/settings-sample.py` example file
-- python3 setup_database.py 
+- python3 setup_database.py

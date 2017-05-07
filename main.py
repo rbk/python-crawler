@@ -11,20 +11,16 @@ import sys
 import os
 import pymysql
 
-import pythoncrawler.settings
+from pythoncrawler.db_connection import *
+from pythoncrawler.settings import *
+from pythoncrawler.curl import *
 import pythoncrawler.url_string_cleaner as url_man
-import pythoncrawler.curl
 import pythoncrawler.save_submission
-import pythoncrawler.db_connection
 
 # Database Setup
-settings.db_conf()
-settings.dbhost = 'localhost'
-settings.dbuser = 'root'
-settings.dbpassword = 'password'
-settings.dbname = 's1'
+settings = settings()
 
-conn = db_connection.db_conn()
+conn = db_conn()
 a = conn.cursor()
 
 def get_links(html, url):
@@ -144,14 +140,14 @@ def crawl(url) :
 	links_array = [url]
 
 	for link in links_array:
-
 		try:
 			# Check link before crawling
 			# check_link = 'SELECT url FROM links WHERE url ="'+link+'"'
 			# already_fetched = a.execute(check_link)
 			already_fetched = False
 			if not already_fetched :
-				html = curl.get_page(link)
+				html = get_page(link)
+				print(html)
 				if html:
 					new_links = get_links(html, link)
 					# print(len(new_links))
@@ -169,6 +165,8 @@ urls = [
 	'https://wired.com',
 	'https://techcrunch.com',
 ]
+print(urls);
+crawl('https://nytimes.com/')
 pool = ThreadPool(2)
 results = pool.map(crawl, urls)
 pool.close()
