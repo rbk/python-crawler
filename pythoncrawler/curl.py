@@ -5,15 +5,16 @@ import re
 import ssl
 from urllib.request import urlopen, Request
 import user_agents
-import url_string_cleaner as url_man
+from pythoncrawler.url_string_cleaner import *
 
 
 def get_page(url) :
 
-	if not url_man.valid_url(url) :
+	if not valid_url(url) :
 		return 'Invalid url'
 
-	domain = url_man.clean_domain(url)
+	domain = clean_domain(url)
+	print(domain)
 	context = ssl._create_unverified_context()
 	ssl._create_default_https_context = ssl._create_unverified_context
 	headers={'User-Agent': user_agents.get_one(0)}
@@ -27,4 +28,3 @@ def get_page(url) :
 	except:
 		# print(response.getcode())
 		'null'
-

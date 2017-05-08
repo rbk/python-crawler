@@ -1,0 +1,3 @@
+# Logs
+
+- errors.log 
