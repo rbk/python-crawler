@@ -1,30 +1,37 @@
 from bs4 import BeautifulSoup
-from time import localtime, strftime
-from urllib.request import Request, urlopen
-from multiprocessing import Pool as ThreadPool
-
 import ssl
 import smtplib
 import re
+from time import localtime, strftime
 import time
-import sys
+import sys 
 import os
 import pymysql
-
-from pythoncrawler.db_connection import *
-from pythoncrawler.settings import *
-from pythoncrawler.curl import *
-import pythoncrawler.url_string_cleaner as url_man
-import pythoncrawler.save_submission
+from urllib.request import Request, urlopen
+import url_string_cleaner as url_man
+from multiprocessing import Pool as ThreadPool 
 
 # Database Setup
-settings = settings()
+import settings
+settings.db_conf()
+settings.dbhost = 'localhost'
+settings.dbuser = 'root'
+settings.dbpassword = 'password'
+settings.dbname = 's1'
 
-conn = db_conn()
+# import setup_database
+
+import db_connection
+conn = db_connection.db_conn()
 a = conn.cursor()
 
-def get_links(html, url):
 
+import curl
+import save_submission
+
+
+def get_links(html, url):
+	
 	links = []
 
 	matches_to_exclude = [
@@ -57,7 +64,7 @@ def get_links(html, url):
 	has_protocol = re.search(r"http:\/\/|https:\/\/|\/\/", url)
 	if hasattr(has_protocol, 'group'):
 		protocol = has_protocol.group(0)
-	else:
+	else: 
 		protocol = 'http://'
 
 	no_http = re.search(r"http:\/\/|https:\/\/", url)
@@ -74,7 +81,7 @@ def get_links(html, url):
 		match = False
 		correct_domain = False
 		not_in_array = False
-
+		
 
 		domain_regex = '\/\/(?:[\w-]+\.)*([\w-]{1,63})(?:\.(?:\w{3}|\w{2}))'
 		has_domain = re.search(domain_regex, href)
@@ -82,7 +89,7 @@ def get_links(html, url):
 			has_domain = True
 		else:
 			has_domain = False
-
+		
 		# NORMALIZE URL
 		if not has_domain and not match:
 			href = url_man.rm_first_slash(href);
@@ -120,7 +127,7 @@ def get_links(html, url):
 			except:
 				# print('EXISTS PROBABLY: ' + href)
 				'null'
-
+			
 			try:
 				domain = url_man.clean_domain(href)
 				add_domain = 'INSERT INTO domain (`domain`) VALUES ("'+domain+'")'
@@ -140,14 +147,14 @@ def crawl(url) :
 	links_array = [url]
 
 	for link in links_array:
+
 		try:
 			# Check link before crawling
 			# check_link = 'SELECT url FROM links WHERE url ="'+link+'"'
 			# already_fetched = a.execute(check_link)
 			already_fetched = False
 			if not already_fetched :
-				html = get_page(link)
-				print(html)
+				html = curl.get_page(link)
 				if html:
 					new_links = get_links(html, link)
 					# print(len(new_links))
@@ -165,9 +172,8 @@ urls = [
 	'https://wired.com',
 	'https://techcrunch.com',
 ]
-print(urls);
-crawl('https://nytimes.com/')
 pool = ThreadPool(2)
 results = pool.map(crawl, urls)
-pool.close()
-pool.join()
+pool.close() 
+pool.join() 
+
