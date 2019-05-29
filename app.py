@@ -1,7 +1,11 @@
 from flask import Flask, jsonify
 from flask import request
-
-import pythoncrawler.settings
+import settings
+settings.db_conf()
+settings.dbhost = 'localhost'
+settings.dbuser = 'root'
+settings.dbpassword = ''
+settings.dbname = 's1'
 
 app = Flask(__name__)
 
@@ -22,7 +26,7 @@ def index():
         </html>
     '''
 
-# Database
+# Database 
 import db_connection
 conn = db_connection.db_conn()
 a = conn.cursor()
