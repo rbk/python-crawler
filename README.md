@@ -1,19 +1,41 @@
-# README.md
+# README
 
-Just building a web crawler in python for fun...
+## About
+The founders of Google used python to fetch pages to build their search engine.
 
-- Python 3.5.2
+> In order to scale to hundreds of millions of web pages, 
+> Google has a fast distributed crawling system. A single URLserver 
+> serves lists of URLs to a number of crawlers (we typically ran about 3). 
+> Both the URLserver and the crawlers are implemented in Python"
+
+I recommend reading the thesis: http://infolab.stanford.edu/~backrub/google.html
+
+This project reflects my curiosity to create a web crawler as a programming challege.
+
+### The stack:
+
+- Python 3.6
 - Flask
 - BeautifulSoup
 - PyMysql
 
-# Todo
-- Filter Social Media Networks
-- Do not try to crawl images
-- Multithread
 
-# Links
+## Progress Log
 
-- Using Tor with Python - http://nessy.info/?p=119
-- Regex Tester - https://regex101.com/
-- Some random pdf - http://0055d26.netsolhost.com/friedman/pdfs/other_commentary/Farmand.02.17.1951.pdf
+### 2019/07/16
+
+In progress...
+
+### 2017/4/28
+
+Start URLs: https://www.reddit.com, https://nytimes.com, http://dmoztools.net
+Crawl time: Approx 4 hours
+Unique URLS: 1,003,156 
+Unique Domains: 79,302
+
+### 2017/4/27
+
+Start URL: https://www.reddit.com
+Crawl time: Approx 4 hours
+Unique URLS: 84,477 
+Unique Domains: 2,747

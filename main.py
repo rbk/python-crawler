@@ -1,39 +1,19 @@
 from bs4 import BeautifulSoup
-import ssl
-import smtplib
 import re
-from time import localtime, strftime
 import time
-import sys 
 import os
-import pymysql
-from urllib.request import Request, urlopen
-import url_string_cleaner as url_man
+import string_clean as url_man
 from multiprocessing import Pool as ThreadPool 
+import requests
 
-# Database Setup
-import settings
-settings.db_conf()
-settings.dbhost = 'localhost'
-settings.dbuser = 'root'
-settings.dbpassword = 'password'
-settings.dbname = 's1'
-
-# import setup_database
-
-import db_connection
-conn = db_connection.db_conn()
-a = conn.cursor()
-
-
-import curl
-import save_submission
-
+uas = [
+	'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
+	'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+]
 
 def get_links(html, url):
-	
-	links = []
 
+	links = []
 	matches_to_exclude = [
 		'youtu\.be',
 		'microsoftstore\.com',
@@ -42,13 +22,14 @@ def get_links(html, url):
 		'itunes\.apple\.com',
 		'facebook\.com',
 		'twitter\.com',
-		# 'google\.com',
+		'google\.com',
+		'amazon.com'
 		'tel:',
 		'mailto:',
 		'javascript:',
 		'ftp:\/\/',
 		'\/\/goo.gl',
-		# '\/\/(\*).wikipedia.org',
+		'\/\/(\*).wikipedia.org',
 		'http:\/\/imgur\.com',
 		'http:\/\/i\.imgur\.com',
 		'(\.pdf)$',
@@ -104,75 +85,48 @@ def get_links(html, url):
 			not_in_array = True
 
 		href = url_man.rm_last_slash(href)
-		# print(href)
 
 		for regex in matches_to_exclude :
 			exclude_match = re.search(regex, href)
 			if hasattr(exclude_match, 'group'):
 				match = True
 				break
-
-		# print(href + '??MATCH?? - ' + str(match))
-
 		if not match:
-			# print(href)
 			links.append(href)
-			try:
-				add_link = 'INSERT INTO links (`url`) VALUES ("'+href+'")'
-				q = a.execute(add_link)
-				conn.commit()
-				print('SAVED: ' + href)
-				# print('[' + counter + '] Success: ' + href)
-				counter = counter + 1
-			except:
-				# print('EXISTS PROBABLY: ' + href)
-				'null'
-			
-			try:
-				domain = url_man.clean_domain(href)
-				add_domain = 'INSERT INTO domain (`domain`) VALUES ("'+domain+'")'
-				q = a.execute(add_domain)
-				conn.commit()
-				# print('Domain added: ' + domain)
-			except:
-				'null'
-
 	return links
 
-def crawl(url) :
 
-	global counter
-	counter = 0
-	max_count = 1000
-	links_array = [url]
-
-	for link in links_array:
-
-		try:
-			# Check link before crawling
-			# check_link = 'SELECT url FROM links WHERE url ="'+link+'"'
-			# already_fetched = a.execute(check_link)
-			already_fetched = False
-			if not already_fetched :
-				html = curl.get_page(link)
-				if html:
-					new_links = get_links(html, link)
-					# print(len(new_links))
-					for new_link in new_links:
-						if new_link not in links_array:
-							links_array.append(new_link)
-		except:
-			'null'
+def crawl(url):
+	links = open('LINKS.txt', 'r').read().splitlines()
+	html = requests.get(url).text
+	new_links = get_links(html, url)
+	for link in new_links:
+		if link not in links:		
+			with open('LINKS.txt', 'a+') as f:
+				print(link)
+				f.write(link + "\n")
+				links.append(link)
+			time.sleep(1)
+		else:
+			pass
+			# print("[{}]".format(int(time.time())), 'link exists...', link)
+	crawl(link)
 
 urls = [
-	'https://nytimes.com/',
+	'https://nytimes.com',
 	'https://reddit.com',
-	'https://amazon.com',
 	'https://yahoo.com',
 	'https://wired.com',
 	'https://techcrunch.com',
+	'https://en.wikipedia.org',
+	'http://www.thealphaweb.com',
+	'https://www.thesaurus.com',
+	'https://www.house.gov'
 ]
-pool = ThreadPool(2)
+
+# crawl('https://netlify.com')
+
+pool = ThreadPool(len(urls)-1)
 results = pool.map(crawl, urls)
 pool.close() 
 pool.join() 
